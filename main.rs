@@ -4,6 +4,7 @@ use std::collections::HashSet;
 //use std::thread;
 use std::{thread, time};
 use std::sync::mpsc;
+use std::{thread, time};
 
 // Attributes of the Rotor Struct
 struct Rotor {
@@ -238,9 +239,12 @@ impl Enigma {
         self.midRotor.pos = pos2;
         self.fastRotor.pos = pos3;
     }
+
+    // Change the settings of the plugboard
+    fn setPlugboard(&mut self, newPlugBoard: Plugboard) {
+        self.plugboard = newPlugBoard;
+    }
 }
-
-
 
 
 fn main() {
@@ -274,6 +278,7 @@ fn main() {
     let mut enigma = Enigma::new(ufw_B,r2,r1,r3, plugboard);
     static plaintext:&str = "Wetterbericht: // Datum: 15. Oktober 1944 // Einsatzort: Sonnenberg // Meldung! Meldung! Hier spricht der Wetterdienst fur den 15. Oktober 1944 im Einsatzgebiet Sonnenberg. // Die Wetterlage fur morgen wird voraussichtlich bedeckt sein, mit starkem Wind aus Osten. Die Temperaturen erreichen ein Maximum von rund 12C, was kuhler als gestern ist. // Es besteht eine hohe Wahrscheinlichkeit fur Niederschlage, mit einer Moglichkeit von Regen wahrend des Nachmittags. Alle Einheiten werden darauf hingewiesen, dass entsprechende Kleidung und Ausrustung fur die geplanten Operationen mitgefuhrt werden mussen. // Sicherheitshinweis: Bei Anderungen der Wetterlage sind die Kommandanten verantwortlich, die notwendigen Massnahmen zum Schutz der Truppen und Ausrustung zu ergreifen. // Das war der Wetterbericht. Bleiben Sie wachsam und passen Sie sich den Wetterbedingungen an. // Weitere Befehle oder Informationen konnen angefordert werden. Das war der Wetterdienst. // Heil Hitler!";
     static mut ciphertext:String = String::new();
+  
     enigma.rotorSettings(11,93,93);
 
     for c in plaintext.chars() {
@@ -324,6 +329,7 @@ fn main() {
             let mut decrypted = "".to_string();
             let mut enigma = Enigma::new(ufw_B,r2,r1,r3, plugboard);
             let start : u8;
+
             start = idx * 12;
             //println!("I am thread {}", idx.to_string());
             'outer: for mut r in start..start+12 {
@@ -337,7 +343,7 @@ fn main() {
                         for c in cptext.chars() {
                             decrypted.push(enigma.encrypt(c as u8));
                         }
-                        let f = fitness(&decrypted, &plaintext.to_string());
+                        let f = fitness(&decrypted, &plaintext.to_string()) as u8;
                         if f > 100 {
                             sender.send((idx,r,j,k,f)).unwrap();
                             println!("{:?}",decrypted);
@@ -350,13 +356,37 @@ fn main() {
         });       
     }
 
+    // Calculate the maximum
+    let mut chosen_rotorConfig: (u8, u8, u8, u8) = (0,0,0,0);
 
     for received in &receiver {
         let (i,r,j, k, f) = received;
         println!("Thread {} found: {} {} {} Fitness: {}",i,r,j,k,f);
         unsafe { if(done) {break;} }
     }
+
+
+    // use the chosen plugboard wire configuration and create new enigma machine
+    let plugboardChosen = Plugboard::new(&chosen_wire_positions);
+    enigma.setPlugboard(plugboardChosen);
+    let (cr, cj, ck, cf) = chosen_rotorConfig;
+    
+    // Set rotor settings based on found best fit
+    enigma.rotorSettings(cr, cj, ck);
+
+    // Get final decrypted plaintext
+    let mut decrypted = "".to_string();
+    unsafe{
+        for c in ciphertext.chars() {
+            decrypted.push(enigma.encrypt(c as u8));
+        }
+    }
+    
+    // Print result
+    println!("Decrypted plaintext from final configured: ");
+    println!("{}", decrypted);
 }
+
 
 fn fitness(s: &String, known_plaintext: &String) -> u64 {
     let mut counter = 0u64;
