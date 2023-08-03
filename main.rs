@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::thread;
 use std::sync::mpsc;
+use std::{thread, time};
 
 // Attributes of the Rotor Struct
 struct Rotor {
@@ -237,14 +238,16 @@ impl Enigma {
         self.midRotor.pos = pos2;
         self.fastRotor.pos = pos3;
     }
+
+    // Change the settings of the plugboard
+    fn setPlugboard(&mut self, newPlugBoard: Plugboard) {
+        self.plugboard = newPlugBoard;
+    }
 }
-
-
 
 
 fn main() {
     let plugboard = Plugboard::new(&[(b'a', b'u'),(b'9', b'T'),(b'Y', b'='),(b'3', b'y'),(b';', b'"'),(b't', b'#'),(b'f', b'r'),(b'C', b'_'),(b'i', b'%'),(b'/', b'$')]);
-    
     let mut ufw_B = Rotor::new(&[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255],
                                 &[103,148,248,233,54,166,89,175,161,128,71,162,176,55,49,69,83,30,208,251,136,35,156,137,51,201,172,255,135,133,17,158,119,178,94,21,236,223,238,65,68,196,124,102,75,230,153,92,159,14,187,24,241,62,4,13,118,74,209,98,130,231,53,239,190,39,155,143,40,15,210,10,142,85,57,44,101,200,140,150,188,229,204,16,221,73,243,181,112,6,147,246,47,191,34,250,232,226,59,157,120,76,43,0,163,127,198,126,170,218,154,224,88,129,179,207,213,141,56,32,100,160,165,174,42,254,107,105,9,113,60,177,244,29,212,28,20,23,252,152,78,117,72,67,171,219,211,90,1,220,79,253,139,46,110,66,22,99,31,48,121,8,11,104,173,122,5,169,237,167,108,144,26,164,123,7,12,131,33,114,202,87,194,206,242,235,249,50,80,247,64,93,214,227,182,205,41,240,106,225,77,25,180,217,82,195,183,115,18,58,70,146,134,116,192,234,222,203,109,145,149,84,216,37,111,199,97,193,245,81,45,61,96,3,215,185,36,168,38,63,197,52,184,86,132,228,91,189,2,186,95,19,138,151,125,27],
                                 0);
@@ -271,9 +274,10 @@ fn main() {
     //                        21);
 
     let mut enigma = Enigma::new(ufw_B,r2,r1,r3, plugboard);
-    static plaintext:&str = "But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure?";
+    static plaintext:&str = "Wetterbericht: // Datum: 15. Oktober 1944 // Einsatzort: Sonnenberg // Meldung! Meldung! Hier spricht der Wetterdienst fur den 15. Oktober 1944 im Einsatzgebiet Sonnenberg. // Die Wetterlage fur morgen wird voraussichtlich bedeckt sein, mit starkem Wind aus Osten. Die Temperaturen erreichen ein Maximum von rund 12C, was kuhler als gestern ist. // Es besteht eine hohe Wahrscheinlichkeit fur Niederschlage, mit einer Moglichkeit von Regen wahrend des Nachmittags. Alle Einheiten werden darauf hingewiesen, dass entsprechende Kleidung und Ausrustung fur die geplanten Operationen mitgefuhrt werden mussen. // Sicherheitshinweis: Bei Anderungen der Wetterlage sind die Kommandanten verantwortlich, die notwendigen Massnahmen zum Schutz der Truppen und Ausrustung zu ergreifen. // Das war der Wetterbericht. Bleiben Sie wachsam und passen Sie sich den Wetterbedingungen an. // Weitere Befehle oder Informationen konnen angefordert werden. Das war der Wetterdienst. // Heil Hitler!";
     static mut ciphertext:String = String::new();
-    enigma.rotorSettings(0,10,20);
+
+    enigma.rotorSettings(11,93,93);
 
     for c in plaintext.chars() {
         let i = enigma.encrypt(c as u8) as u8;
@@ -316,7 +320,7 @@ fn main() {
             let start : u8;
             start = idx * 32;
             sender2.send(idx);
-            //println!("I am thread {}", idx.to_string());
+            
             'outer: for r in start..=start+31 {
                 for j in 0..=255 {
                     for k in 0..=255 {
@@ -325,7 +329,7 @@ fn main() {
                         for c in cptext.chars() {
                             decrypted.push(enigma.encrypt(c as u8));
                         }
-                        let f = fitness(&decrypted, &plaintext.to_string());
+                        let f = fitness(&decrypted, &plaintext.to_string()) as u8;
                         if f > 100 {
                             sender.send((idx,r,j,k,f)).unwrap();
                             unsafe { done = true; }
@@ -334,18 +338,41 @@ fn main() {
                     }
                 }
             }
-        });       
-        t.join().unwrap();
-        //threads.push(t);
+        });      
+        t.join().unwrap(); 
     }
 
+    // Calculate the maximum
+    let mut chosen_rotorConfig: (u8, u8, u8, u8) = (0,0,0,0);
 
     for received in &receiver {
         let (i,r,j, k, f) = received;
         println!("Thread {} found: {} {} {} Fitness: {}",i,r,j,k,f);
         unsafe { if(done) {break;} }
     }
+
+
+    // use the chosen plugboard wire configuration and create new enigma machine
+    let plugboardChosen = Plugboard::new(&chosen_wire_positions);
+    enigma.setPlugboard(plugboardChosen);
+    let (cr, cj, ck, cf) = chosen_rotorConfig;
+    
+    // Set rotor settings based on found best fit
+    enigma.rotorSettings(cr, cj, ck);
+
+    // Get final decrypted plaintext
+    let mut decrypted = "".to_string();
+    unsafe{
+        for c in ciphertext.chars() {
+            decrypted.push(enigma.encrypt(c as u8));
+        }
+    }
+    
+    // Print result
+    println!("Decrypted plaintext from final configured: ");
+    println!("{}", decrypted);
 }
+
 
 fn fitness(s: &String, known_plaintext: &String) -> u64 {
     let mut counter = 0u64;
@@ -357,4 +384,3 @@ fn fitness(s: &String, known_plaintext: &String) -> u64 {
     }
     counter
 }
-
