@@ -283,7 +283,7 @@ fn main() {
     
     static mut ciphertext:String = String::new();
 
-    enigma.rotorSettings(1,1,1);
+    enigma.rotorSettings(1,25,24);
 
     for c in plaintext.chars() {
         let i = enigma.encrypt(c as u8) as u8;
@@ -292,7 +292,7 @@ fn main() {
     unsafe{println!("{:?}", ciphertext);}
 
     let mut decrypted:String = String::new();
-    enigma.rotorSettings(1,1,1);
+    enigma.rotorSettings(1,25, 24);
     unsafe{
         for c in ciphertext.chars() {
             let i = enigma.encrypt(c as u8) as u8;
@@ -412,7 +412,7 @@ fn main() {
 
     println!("Plugboard: {:?}", enigma.plugboard.map);
     println!("decrypted before plugboard: {}", decrypted);
-    println!("Chosen plugboard {:?}", chosen_rotorConfig);
+    println!("Chosen rotor configuration {:?}", chosen_rotorConfig);
     
 
     // ******************************
