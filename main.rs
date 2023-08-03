@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::thread;
 use std::sync::mpsc;
+use std::sync::{Arc, Mutex};
 
 // Attributes of the Rotor Struct
 struct Rotor {
@@ -246,8 +247,9 @@ impl Enigma {
 
 
 fn main() {
-    let min_fitness = 50u64;
-    let plugboard = Plugboard::new(&[(b'&', b'2'),(b'f', b'R'),(b';', b','),(b'\\', b'K'),(b'r', b'3'),(b'I', b'0'),(b'>', b'i'),(b'v', b'1'),(b'@', b'T'),(b'7', b')'),(b'X', b'y'),(b'[', b'"'),(b's', b'd'),(b'S', b'4'),(b'h', b'e'),(b'6', b'P'),(b'n', b' '),(b'C', b'q'),(b'H', b'j'),(b'V', b'a'),(b'o', b'/'),(b'M', b'Z'),(b'm', b'_'),(b'U', b'~'),(b'E', b'<'),(b'-', b'l'),(b'$', b'+'),(b']', b'Y'),(b'N', b'O'),(b'g', b'W'),(b'%', b'('),(b'L', b'='),(b'w', b'c'),(b':', b't'),(b'#', b'?'),(b'B', b'*'),(b'8', b'A'),(b'.', b'k'),(b'J', b'z'),(b'b', b'{'),]);
+    // let min_fitness = 20u64;
+    let plugboard = Plugboard::new(&[(b'L', b'r'),(b'S', b'V'),(b'#', b'T'),(b'C', b'c'),(b'x', b'j'),(b':', b'?'),(b'^', b'('),(b'p', b'i'),(b'N', b'D'),(b'9', b'H'),(b'<', b'R'),(b'Q', b'b'),(b'6', b'n'),(b'A', b'a'),(b'G', b'Y'),(b'K', b'M'),(b'l', b'$'),(b'7', b's'),(b'd', b'F'),(b'u', b'='),]
+);
     let num_wires = (plugboard.map.len() as u8) / 2;
     let mut ufw_B = Rotor::new(&[b'0', b'1', b'2', b'3', b'4', b'5', b'6', b'7', b'8', b'9', b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j', b'k', b'l', b'm', b'n', b'o', b'p', b'q', b'r', b's', b't', b'u', b'v', b'w', b'x', b'y', b'z', b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'I', b'J', b'K', b'L', b'M', b'N', b'O', b'P', b'Q', b'R', b'S', b'T', b'U', b'V', b'W', b'X', b'Y', b'Z', b'!', b'"', b'#', b'$', b'%', b'&', b' ', b'(', b')', b'*', b'+', b',', b'-', b'.', b'/', b':', b';', b'<', b'=', b'>', b'?', b'@', b'[', b'\\', b']', b'^', b'_', b'`', b'{', b'|', b'}', b'~'],
         &[b'w', b'z', b'u', b'L', b'?', b's', b'"', b'8', b'7', b'M', b'J', b'F', b'd', b'c', b'/', b':', b'#', b'$', b'>', b'q', b'o', b'|', b'@', b',', b'k', b'B', b'j', b' ', b'5', b'R', b'2', b'G', b'0', b'}', b'T', b'1', b'{', b'p', b'N', b'Q', b'K', b'b', b'v', b'O', b')', b'a', b'E', b'3', b'9', b'C', b'H', b'+', b'D', b't', b'^', b'y', b'Z', b'_', b';', b'`', b'!', b'U', b'Y', b'6', b'g', b'h', b'&', b'%', b'r', b'=', b'I', b'.', b'P', b'n', b'<', b'*', b'e', b'f', b'W', b'-', b'(', b'i', b'4', b'm', b']', b'~', b'[', b'S', b'V', b'X', b'A', b'l', b'x', b'\\'],
@@ -261,7 +263,8 @@ fn main() {
     let mut r3 = Rotor::new(&[b'0', b'1', b'2', b'3', b'4', b'5', b'6', b'7', b'8', b'9', b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j', b'k', b'l', b'm', b'n', b'o', b'p', b'q', b'r', b's', b't', b'u', b'v', b'w', b'x', b'y', b'z', b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'I', b'J', b'K', b'L', b'M', b'N', b'O', b'P', b'Q', b'R', b'S', b'T', b'U', b'V', b'W', b'X', b'Y', b'Z', b'!', b'"', b'#', b'$', b'%', b'&', b' ', b'(', b')', b'*', b'+', b',', b'-', b'.', b'/', b':', b';', b'<', b'=', b'>', b'?', b'@', b'[', b'\\', b']', b'^', b'_', b'`', b'{', b'|', b'}', b'~'],
         &[b'T', b'y', b'l', b':', b'p', b'2', b'>', b'E', b'o', b'Q', b'+', b'f', b' ', b'!', b'(', b'M', b'L', b's', b'J', b'&', b'P', b'r', b'U', b'$', b'.', b'Y', b'|', b']', b'C', b';', b'^', b'W', b'9', b'?', b'{', b'D', b'n', b'%', b'@', b'V', b'I', b'7', b'B', b'N', b'u', b'6', b'~', b'"', b'5', b'q', b'c', b'K', b'0', b'4', b'`', b'\\', b'}', b'-', b'e', b'w', b'i', b'h', b'g', b'm', b',', b'b', b'k', b'3', b'X', b'=', b'[', b'j', b'R', b'O', b'_', b'v', b'H', b'd', b'<', b'x', b'#', b'A', b'*', b'z', b'/', b')', b't', b'S', b'a', b'G', b'F', b'1', b'8', b'Z'],
         47);
-        //let mut ufw_B = Rotor::new(&[b'A',b'B',b'C',b'D',b'E',b'F',b'G',b'H',b'I',b'J',b'K',b'L',b'M',b'N',b'O',b'P',b'Q',b'R',b'S',b'T',b'U',b'V',b'W',b'X',b'Y',b'Z'],
+    
+    //let mut ufw_B = Rotor::new(&[b'A',b'B',b'C',b'D',b'E',b'F',b'G',b'H',b'I',b'J',b'K',b'L',b'M',b'N',b'O',b'P',b'Q',b'R',b'S',b'T',b'U',b'V',b'W',b'X',b'Y',b'Z'],
     //                           &[b'Y',b'R',b'U',b'H',b'Q',b'S',b'L',b'D',b'P',b'X',b'N',b'G',b'O',b'K',b'M',b'I',b'E',b'B',b'F',b'Z',b'C',b'W',b'V',b'J',b'A',b'T'],
     //                           0);
     //let mut r1 = Rotor::new(&[b'A',b'B',b'C',b'D',b'E',b'F',b'G',b'H',b'I',b'J',b'K',b'L',b'M',b'N',b'O',b'P',b'Q',b'R',b'S',b'T',b'U',b'V',b'W',b'X',b'Y',b'Z'],
@@ -275,12 +278,12 @@ fn main() {
     //                        21);
 
     let mut enigma = Enigma::new(ufw_B,r2,r1,r3, plugboard);
-    static plaintext:&str = "Wetterbericht: // Datum: 15. Oktober 1944 // Einsatzort: Sonnenberg // Meldung! Meldung! Hier spricht der Wetterdienst fur den 15. Oktober 1944 im Einsatzgebiet Sonnenberg. // Die Wetterlage fur morgen wird voraussichtlich bedeckt sein, mit starkem Wind aus Osten. Die Temperaturen erreichen ein Maximum von rund 12C, was kuhler als gestern ist. // Es besteht eine hohe Wahrscheinlichkeit fur Niederschlage, mit einer Moglichkeit von Regen wahrend des Nachmittags. Alle Einheiten werden darauf hingewiesen, dass entsprechende Kleidung und Ausrustung fur die geplanten Operationen mitgefuhrt werden mussen. // Sicherheitshinweis: Bei Anderungen der Wetterlage sind die Kommandanten verantwortlich, die notwendigen Massnahmen zum Schutz der Truppen und Ausrustung zu ergreifen. // Das war der Wetterbericht. Bleiben Sie wachsam und passen Sie sich den Wetterbedingungen an. // Weitere Befehle oder Informationen konnen angefordert werden. Das war der Wetterdienst. // Heil Hitler!";
+    static plaintext:&str = "Wetterbericht: // Datum: 15. Oktober 1940 // Einsatzort: Sonnenberg // Meldung! Meldung! Hier spricht der Wetterdienst fur den 15. Oktober 1944 im Einsatzgebiet Sonnenberg. // Die Wetterlage fur morgen wird voraussichtlich bedeckt sein, mit starkem Wind aus Osten. Die Temperaturen erreichen ein Maximum von rund 12C, was kuhler als gestern ist. // Es besteht eine hohe Wahrscheinlichkeit fur Niederschlage, mit einer Moglichkeit von Regen wahrend des Nachmittags. Alle Einheiten werden darauf hingewiesen, dass entsprechende Kleidung und Ausrustung fur die geplanten Operationen mitgefuhrt werden mussen. // Sicherheitshinweis: Bei Anderungen der Wetterlage sind die Kommandanten verantwortlich, die notwendigen Massnahmen zum Schutz der Truppen und Ausrustung zu ergreifen. // Das war der Wetterbericht. Bleiben Sie wachsam und passen Sie sich den Wetterbedingungen an. // Weitere Befehle oder Informationen konnen angefordert werden. Das war der Wetterdienst. // Heil Hitler!";
     // static plaintext:&str = "Es ist von entscheidender Bedeutung, dass unsere Truppen sich den wechselnden Wetterbedingungen anpassen. Plant und koordiniert Bewegungen, Logistik und taktische Operationen entsprechend. Denkt daran, dass das Wetter sowohl ein Verdundeter als auch ein Gegner sein kann, je nachdem, wie gut wir uns den Herausforderungen stellen.";
     
     static mut ciphertext:String = String::new();
 
-    enigma.rotorSettings(11,93,93);
+    enigma.rotorSettings(1,1,1);
 
     for c in plaintext.chars() {
         let i = enigma.encrypt(c as u8) as u8;
@@ -289,7 +292,7 @@ fn main() {
     unsafe{println!("{:?}", ciphertext);}
 
     let mut decrypted:String = String::new();
-    enigma.rotorSettings(11,93,93);
+    enigma.rotorSettings(1,1,1);
     unsafe{
         for c in ciphertext.chars() {
             let i = enigma.encrypt(c as u8) as u8;
@@ -298,19 +301,39 @@ fn main() {
     }
     println!("{:?}", decrypted);
 
-    // Make 8 threads
-    //let mut threads : Vec<thread::JoinHandle<_>> = Vec::new();
-    let (sender, receiver) = mpsc::channel();
+    // Reset enigma machine
+    // Setup engima machine for attack
+    enigma.rotorSettings(0, 0, 0);
+    let plugboard = Plugboard::new(&[]);
+    enigma.setPlugboard(plugboard);
 
-    static mut done: bool = false;
+
+    // ***************************
+    // ***** ATTACK 
+    // ***************************
+    // Make 8 threads AND ATTACK
+    //let mut threads : Vec<thread::JoinHandle<_>> = Vec::new();
+    // let (sender, receiver) = mpsc::channel();
+
+    // static mut done: [bool;8] = [false;8];
     println!("\nStarting 8 threads...");
 
+    // static mut maximum_fitness: u64 = 0;
+    // static mut chosen_rotorConfig: (u8, u8, u8, u64);
+
+    let mut maximum_fitness = Arc::new(Mutex::new(0));
+    let mut chosen_rotor_Config = Arc::new(Mutex::new((0 as u8,0 as u8,0 as u8,0 as u64)));
+    let mut handles = vec![];
+    
+    // Create threads
     for idx in 0..8 {
-        // static mut index: u8 = 0;
-        // unsafe{index += i;}
-        let sender = sender.clone();
-        let t = thread::spawn(move || {
-            let plugboard = Plugboard::new(&[]);
+        let maximum_fitness = Arc::clone(&maximum_fitness);
+        let chosen_rotor_Config = Arc::clone(&chosen_rotor_Config);
+
+        let handle = thread::spawn(move || {
+            println!("Thread {idx} running");
+
+            let plugboard = Plugboard::new(&[(b'[', b'5'),(b'H', b'|'),(b'j', b'Y'),(b'.', b'r'),(b'f', b'e'),(b'h', b'#'),(b'S', b'c'),(b';', b'd'),(b'6', b'&'),(b':', b'E'),(b'J', b' '),(b'R', b'8'),(b'X', b'G'),(b'1', b']'),(b'\\', b'}'),]);
             let mut ufw_B = Rotor::new(&[b'0', b'1', b'2', b'3', b'4', b'5', b'6', b'7', b'8', b'9', b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j', b'k', b'l', b'm', b'n', b'o', b'p', b'q', b'r', b's', b't', b'u', b'v', b'w', b'x', b'y', b'z', b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'I', b'J', b'K', b'L', b'M', b'N', b'O', b'P', b'Q', b'R', b'S', b'T', b'U', b'V', b'W', b'X', b'Y', b'Z', b'!', b'"', b'#', b'$', b'%', b'&', b' ', b'(', b')', b'*', b'+', b',', b'-', b'.', b'/', b':', b';', b'<', b'=', b'>', b'?', b'@', b'[', b'\\', b']', b'^', b'_', b'`', b'{', b'|', b'}', b'~'],
             &[b'w', b'z', b'u', b'L', b'?', b's', b'"', b'8', b'7', b'M', b'J', b'F', b'd', b'c', b'/', b':', b'#', b'$', b'>', b'q', b'o', b'|', b'@', b',', b'k', b'B', b'j', b' ', b'5', b'R', b'2', b'G', b'0', b'}', b'T', b'1', b'{', b'p', b'N', b'Q', b'K', b'b', b'v', b'O', b')', b'a', b'E', b'3', b'9', b'C', b'H', b'+', b'D', b't', b'^', b'y', b'Z', b'_', b';', b'`', b'!', b'U', b'Y', b'6', b'g', b'h', b'&', b'%', b'r', b'=', b'I', b'.', b'P', b'n', b'<', b'*', b'e', b'f', b'W', b'-', b'(', b'i', b'4', b'm', b']', b'~', b'[', b'S', b'V', b'X', b'A', b'l', b'x', b'\\'],
             0);
@@ -335,42 +358,62 @@ fn main() {
                 //println!("{:?}",r);
                 for j in 0..94 {
                     for k in 0..94 {
-                        unsafe { if (done) {break 'outer;}}
                         enigma.rotorSettings(r,j,k);
                         let mut decrypted = "".to_string();
                         for c in cptext.chars() {
                             decrypted.push(enigma.encrypt(c as u8));
                         }
                         let f = fitness(&decrypted, &plaintext.to_string());
-                        if f > min_fitness {
-                            sender.send((idx,r,j,k,f,decrypted)).unwrap();
-                            //println!("{:?}",decrypted);
-                            unsafe { done = true; }
+                        let mut max = maximum_fitness.lock().unwrap();
+                            if f > *max {
+                                *max = f;
+                                let mut chosenRotor = chosen_rotor_Config.lock().unwrap();
+                                *chosenRotor = (r, j, k, f);
+                                // sender.send((idx,r,j,k,f,decrypted)).unwrap();
+                                // println!("{:?}",decrypted);
+                            }
                         }
                     }
                 }
-            }
-            println!("Thread {idx} completed");
-        });
+                println!("Thread {idx} completed");
+            });
+            handles.push(handle);
+        
     }
 
-    let mut chosen_rotorConfig: (u8, u8, u8, u64) = (0,0,0,0);
+    for handle in handles {
+        handle.join().unwrap();
+    }
+    
+    let chosen_rotorConfig = *chosen_rotor_Config.lock().unwrap();
+    
     let mut decrypted: String = String::new();
     let mut current_fitness: u64 = 0; // the current fitness of the text before plugboard with the correct rotor settings
-
-    for received in &receiver {
-        let (i,r,j, k, f, d) = received;
-        decrypted = d;
-        println!("Thread {} found: {} {} {} Fitness: {}",i,r,j,k,f);
-        
-        chosen_rotorConfig = (r, j, k, f);
-        current_fitness = f;
-
-        unsafe { if(done) {break;} }
+    
+    let (r, j, k, f) = chosen_rotorConfig;
+    current_fitness = f;
+    enigma.rotorSettings(r,j,k);
+    let mut decrypted = "".to_string();
+    let cptext = unsafe{ &*ciphertext }; 
+    for c in cptext.chars() {
+        decrypted.push(enigma.encrypt(c as u8));
     }
-    println!("{}", decrypted);
-    println!("Chosen plugboard {:?}", chosen_rotorConfig);
 
+    // for received in &receiver {
+    //     let (i,r,j, k, f, d) = received;
+    //     decrypted = d;
+    //     println!("Thread {} found: {} {} {} Fitness: {}",i,r,j,k,f);
+        
+    //     chosen_rotorConfig = (r, j, k, f);
+    //     current_fitness = f;
+
+    //     unsafe { if(done) {break;} }
+    // }
+
+    println!("Plugboard: {:?}", enigma.plugboard.map);
+    println!("decrypted before plugboard: {}", decrypted);
+    println!("Chosen plugboard {:?}", chosen_rotorConfig);
+    
 
     // ******************************
     // Find the plugboard settings
@@ -393,7 +436,7 @@ fn main() {
         let (a,b) = it;
         if a != b {
             // Try to connect cipher to known plaintext
-            if printables.contains(&(a as u8)) || printables.contains(&(b as u8)) {
+            if printables.contains(&(a as u8)) && printables.contains(&(b as u8)) {
                 // Push the wire position to be tested for fitness
                 chosen_wire_positions.push((a as u8, b as u8));
 
@@ -413,7 +456,8 @@ fn main() {
                 let f = fitness(&decrypted, &plaintext.to_string());
 
                 // Check the fitness of the text
-                if f > current_fitness {
+                if f > current_fitness + 10 {
+                    println!("Current Fitness {} to {}", current_fitness, f);
                     // Possibly a correct wire connection
                     current_fitness = f;
 
