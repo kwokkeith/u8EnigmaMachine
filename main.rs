@@ -4,7 +4,6 @@ use std::collections::HashSet;
 //use std::thread;
 use std::{thread, time};
 use std::sync::mpsc;
-use std::{thread, time};
 
 // Attributes of the Rotor Struct
 struct Rotor {
@@ -278,7 +277,7 @@ fn main() {
     let mut enigma = Enigma::new(ufw_B,r2,r1,r3, plugboard);
     static plaintext:&str = "Wetterbericht: // Datum: 15. Oktober 1944 // Einsatzort: Sonnenberg // Meldung! Meldung! Hier spricht der Wetterdienst fur den 15. Oktober 1944 im Einsatzgebiet Sonnenberg. // Die Wetterlage fur morgen wird voraussichtlich bedeckt sein, mit starkem Wind aus Osten. Die Temperaturen erreichen ein Maximum von rund 12C, was kuhler als gestern ist. // Es besteht eine hohe Wahrscheinlichkeit fur Niederschlage, mit einer Moglichkeit von Regen wahrend des Nachmittags. Alle Einheiten werden darauf hingewiesen, dass entsprechende Kleidung und Ausrustung fur die geplanten Operationen mitgefuhrt werden mussen. // Sicherheitshinweis: Bei Anderungen der Wetterlage sind die Kommandanten verantwortlich, die notwendigen Massnahmen zum Schutz der Truppen und Ausrustung zu ergreifen. // Das war der Wetterbericht. Bleiben Sie wachsam und passen Sie sich den Wetterbedingungen an. // Weitere Befehle oder Informationen konnen angefordert werden. Das war der Wetterdienst. // Heil Hitler!";
     static mut ciphertext:String = String::new();
-  
+
     enigma.rotorSettings(11,93,93);
 
     for c in plaintext.chars() {
