@@ -248,7 +248,7 @@ impl Enigma {
 
 fn main() {
     // let min_fitness = 20u64;
-    let plugboard = Plugboard::new(&[(b'L', b'r'),(b'S', b'V'),(b'#', b'T'),(b'C', b'c'),(b'x', b'j'),(b':', b'?'),(b'^', b'('),(b'p', b'i'),(b'N', b'D'),(b'9', b'H'),(b'<', b'R'),(b'Q', b'b'),(b'6', b'n'),(b'A', b'a'),(b'G', b'Y'),(b'K', b'M'),(b'l', b'$'),(b'7', b's'),(b'd', b'F'),(b'u', b'='),]
+    let plugboard = Plugboard::new(&[(b'B', b'U'),(b'`', b'N'),(b']', b'4'),(b'I', b'%'),(b'"', b'f'),(b'}', b'Z'),(b'D', b'+'),(b'A', b'9'),(b'3', b'8'),(b'*', b'2'),]
 );
     let num_wires = (plugboard.map.len() as u8) / 2;
     let mut ufw_B = Rotor::new(&[b'0', b'1', b'2', b'3', b'4', b'5', b'6', b'7', b'8', b'9', b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j', b'k', b'l', b'm', b'n', b'o', b'p', b'q', b'r', b's', b't', b'u', b'v', b'w', b'x', b'y', b'z', b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'I', b'J', b'K', b'L', b'M', b'N', b'O', b'P', b'Q', b'R', b'S', b'T', b'U', b'V', b'W', b'X', b'Y', b'Z', b'!', b'"', b'#', b'$', b'%', b'&', b' ', b'(', b')', b'*', b'+', b',', b'-', b'.', b'/', b':', b';', b'<', b'=', b'>', b'?', b'@', b'[', b'\\', b']', b'^', b'_', b'`', b'{', b'|', b'}', b'~'],
@@ -333,7 +333,7 @@ fn main() {
         let handle = thread::spawn(move || {
             println!("Thread {idx} running");
 
-            let plugboard = Plugboard::new(&[(b'[', b'5'),(b'H', b'|'),(b'j', b'Y'),(b'.', b'r'),(b'f', b'e'),(b'h', b'#'),(b'S', b'c'),(b';', b'd'),(b'6', b'&'),(b':', b'E'),(b'J', b' '),(b'R', b'8'),(b'X', b'G'),(b'1', b']'),(b'\\', b'}'),]);
+            let plugboard = Plugboard::new(&[]);
             let mut ufw_B = Rotor::new(&[b'0', b'1', b'2', b'3', b'4', b'5', b'6', b'7', b'8', b'9', b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j', b'k', b'l', b'm', b'n', b'o', b'p', b'q', b'r', b's', b't', b'u', b'v', b'w', b'x', b'y', b'z', b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'I', b'J', b'K', b'L', b'M', b'N', b'O', b'P', b'Q', b'R', b'S', b'T', b'U', b'V', b'W', b'X', b'Y', b'Z', b'!', b'"', b'#', b'$', b'%', b'&', b' ', b'(', b')', b'*', b'+', b',', b'-', b'.', b'/', b':', b';', b'<', b'=', b'>', b'?', b'@', b'[', b'\\', b']', b'^', b'_', b'`', b'{', b'|', b'}', b'~'],
             &[b'w', b'z', b'u', b'L', b'?', b's', b'"', b'8', b'7', b'M', b'J', b'F', b'd', b'c', b'/', b':', b'#', b'$', b'>', b'q', b'o', b'|', b'@', b',', b'k', b'B', b'j', b' ', b'5', b'R', b'2', b'G', b'0', b'}', b'T', b'1', b'{', b'p', b'N', b'Q', b'K', b'b', b'v', b'O', b')', b'a', b'E', b'3', b'9', b'C', b'H', b'+', b'D', b't', b'^', b'y', b'Z', b'_', b';', b'`', b'!', b'U', b'Y', b'6', b'g', b'h', b'&', b'%', b'r', b'=', b'I', b'.', b'P', b'n', b'<', b'*', b'e', b'f', b'W', b'-', b'(', b'i', b'4', b'm', b']', b'~', b'[', b'S', b'V', b'X', b'A', b'l', b'x', b'\\'],
             0);
@@ -420,7 +420,7 @@ fn main() {
     // ******************************
 
     let mut chosen_wire_positions: Vec<(u8, u8)> = Vec::new(); 
-    let mut wire_idx:u8 = 0u8;
+    let mut wire_idx = 0u8;
 
     let (cr, cj, ck, cf) = chosen_rotorConfig;
     enigma.rotorSettings(cr, cj, ck);
