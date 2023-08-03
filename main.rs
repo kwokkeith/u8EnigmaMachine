@@ -246,7 +246,9 @@ impl Enigma {
 
 
 fn main() {
-    let plugboard = Plugboard::new(&[(b'a', b'u'),(b'9', b'T'),(b'Y', b'='),(b'3', b'y'),(b';', b'"'),(b't', b'#'),(b'f', b'r'),(b'C', b'_'),(b'i', b'%'),(b'/', b'$')]);
+    let min_fitness = 50u64;
+    let plugboard = Plugboard::new(&[(b'&', b'2'),(b'f', b'R'),(b';', b','),(b'\\', b'K'),(b'r', b'3'),(b'I', b'0'),(b'>', b'i'),(b'v', b'1'),(b'@', b'T'),(b'7', b')'),(b'X', b'y'),(b'[', b'"'),(b's', b'd'),(b'S', b'4'),(b'h', b'e'),(b'6', b'P'),(b'n', b' '),(b'C', b'q'),(b'H', b'j'),(b'V', b'a'),(b'o', b'/'),(b'M', b'Z'),(b'm', b'_'),(b'U', b'~'),(b'E', b'<'),(b'-', b'l'),(b'$', b'+'),(b']', b'Y'),(b'N', b'O'),(b'g', b'W'),(b'%', b'('),(b'L', b'='),(b'w', b'c'),(b':', b't'),(b'#', b'?'),(b'B', b'*'),(b'8', b'A'),(b'.', b'k'),(b'J', b'z'),(b'b', b'{'),]);
+    let num_wires = (plugboard.map.len() as u8) / 2;
     let mut ufw_B = Rotor::new(&[b'0', b'1', b'2', b'3', b'4', b'5', b'6', b'7', b'8', b'9', b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j', b'k', b'l', b'm', b'n', b'o', b'p', b'q', b'r', b's', b't', b'u', b'v', b'w', b'x', b'y', b'z', b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'I', b'J', b'K', b'L', b'M', b'N', b'O', b'P', b'Q', b'R', b'S', b'T', b'U', b'V', b'W', b'X', b'Y', b'Z', b'!', b'"', b'#', b'$', b'%', b'&', b' ', b'(', b')', b'*', b'+', b',', b'-', b'.', b'/', b':', b';', b'<', b'=', b'>', b'?', b'@', b'[', b'\\', b']', b'^', b'_', b'`', b'{', b'|', b'}', b'~'],
         &[b'w', b'z', b'u', b'L', b'?', b's', b'"', b'8', b'7', b'M', b'J', b'F', b'd', b'c', b'/', b':', b'#', b'$', b'>', b'q', b'o', b'|', b'@', b',', b'k', b'B', b'j', b' ', b'5', b'R', b'2', b'G', b'0', b'}', b'T', b'1', b'{', b'p', b'N', b'Q', b'K', b'b', b'v', b'O', b')', b'a', b'E', b'3', b'9', b'C', b'H', b'+', b'D', b't', b'^', b'y', b'Z', b'_', b';', b'`', b'!', b'U', b'Y', b'6', b'g', b'h', b'&', b'%', b'r', b'=', b'I', b'.', b'P', b'n', b'<', b'*', b'e', b'f', b'W', b'-', b'(', b'i', b'4', b'm', b']', b'~', b'[', b'S', b'V', b'X', b'A', b'l', b'x', b'\\'],
     0);
@@ -274,9 +276,11 @@ fn main() {
 
     let mut enigma = Enigma::new(ufw_B,r2,r1,r3, plugboard);
     static plaintext:&str = "Wetterbericht: // Datum: 15. Oktober 1944 // Einsatzort: Sonnenberg // Meldung! Meldung! Hier spricht der Wetterdienst fur den 15. Oktober 1944 im Einsatzgebiet Sonnenberg. // Die Wetterlage fur morgen wird voraussichtlich bedeckt sein, mit starkem Wind aus Osten. Die Temperaturen erreichen ein Maximum von rund 12C, was kuhler als gestern ist. // Es besteht eine hohe Wahrscheinlichkeit fur Niederschlage, mit einer Moglichkeit von Regen wahrend des Nachmittags. Alle Einheiten werden darauf hingewiesen, dass entsprechende Kleidung und Ausrustung fur die geplanten Operationen mitgefuhrt werden mussen. // Sicherheitshinweis: Bei Anderungen der Wetterlage sind die Kommandanten verantwortlich, die notwendigen Massnahmen zum Schutz der Truppen und Ausrustung zu ergreifen. // Das war der Wetterbericht. Bleiben Sie wachsam und passen Sie sich den Wetterbedingungen an. // Weitere Befehle oder Informationen konnen angefordert werden. Das war der Wetterdienst. // Heil Hitler!";
+    // static plaintext:&str = "Es ist von entscheidender Bedeutung, dass unsere Truppen sich den wechselnden Wetterbedingungen anpassen. Plant und koordiniert Bewegungen, Logistik und taktische Operationen entsprechend. Denkt daran, dass das Wetter sowohl ein Verdundeter als auch ein Gegner sein kann, je nachdem, wie gut wir uns den Herausforderungen stellen.";
+    
     static mut ciphertext:String = String::new();
 
-    enigma.rotorSettings(1,1,1);
+    enigma.rotorSettings(11,93,93);
 
     for c in plaintext.chars() {
         let i = enigma.encrypt(c as u8) as u8;
@@ -285,7 +289,7 @@ fn main() {
     unsafe{println!("{:?}", ciphertext);}
 
     let mut decrypted:String = String::new();
-    enigma.rotorSettings(1,1,1);
+    enigma.rotorSettings(11,93,93);
     unsafe{
         for c in ciphertext.chars() {
             let i = enigma.encrypt(c as u8) as u8;
@@ -338,7 +342,7 @@ fn main() {
                             decrypted.push(enigma.encrypt(c as u8));
                         }
                         let f = fitness(&decrypted, &plaintext.to_string());
-                        if f > 100 {
+                        if f > min_fitness {
                             sender.send((idx,r,j,k,f,decrypted)).unwrap();
                             //println!("{:?}",decrypted);
                             unsafe { done = true; }
@@ -383,7 +387,7 @@ fn main() {
 
     // Compare the cipher and plaintext based on the OPTIMUM rotor configuration
     for it in plaintext.chars().zip(decrypted.chars()) {
-        if (wire_idx >= 10){
+        if wire_idx >= num_wires {
             break;
         }
         let (a,b) = it;
@@ -436,7 +440,7 @@ fn main() {
 
     // DO 1 wire at the time and find the best fitness
     // using position instead of mapping from cipher to plaintext
-    while wire_idx < 10 {
+    while wire_idx < num_wires {
         let mut maximum = 0 as u8;
         let mut chosen_position = (0, 0);
 
@@ -460,7 +464,7 @@ fn main() {
                 if maximum < f {
                     maximum = f;
                     chosen_position = (printables[s], printables[t]);
-                    println!("#{} wire connect between {} & {} with fitness {}", wire_idx, s, t, maximum)
+                    // println!("#{} wire connect between {} & {} with fitness {}", wire_idx, printables[s] as char, printables[t] as char, maximum)
                 }
 
                 // Remove the current wiring setting that we are trying
@@ -505,6 +509,7 @@ fn main() {
     // Print result
     println!("Decrypted plaintext from final configured: ");
     println!("{}", decrypted);
+    assert_eq!(plaintext,decrypted);
 }
 
 
