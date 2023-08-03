@@ -273,7 +273,7 @@ fn main() {
     let mut enigma = Enigma::new(ufw_B,r2,r1,r3, plugboard);
     static plaintext:&str = "But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure?";
     static mut ciphertext:String = String::new();
-    enigma.rotorSettings(1,150,20);
+    enigma.rotorSettings(0,10,20);
 
     for c in plaintext.chars() {
         let i = enigma.encrypt(c as u8) as u8;
@@ -282,16 +282,19 @@ fn main() {
     unsafe{println!("{:?}", ciphertext);}
 
     // Make 8 threads
-    // let mut threads : Vec<thread::JoinHandle<_>> = Vec::new();
+    //let mut threads : Vec<thread::JoinHandle<_>> = Vec::new();
     let (sender, receiver) = mpsc::channel();
     let (sender2, receiver2) = mpsc::channel();
+
+    static mut done: bool = false;
+    println!("\nStarting 8 threads...");
 
     for idx in 0..8 {
         // static mut index: u8 = 0;
         // unsafe{index += i;}
         let sender = sender.clone();
         let sender2 = sender2.clone();
-        thread::spawn(move || {
+        let t = thread::spawn(move || {
             let plugboard = Plugboard::new(&[(b'a', b'u'),(b'9', b'T'),(b'Y', b'='),(b'3', b'y'),(b';', b'"'),(b't', b'#'),(b'f', b'r'),(b'C', b'_'),(b'i', b'%'),(b'/', b'$')]);
     
             let mut ufw_B = Rotor::new(&[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255],
@@ -313,8 +316,8 @@ fn main() {
             let start : u8;
             start = idx * 32;
             sender2.send(idx);
-            println!("I am thread {}", idx.to_string());
-            for r in start..=start+32 {
+            //println!("I am thread {}", idx.to_string());
+            'outer: for r in start..=start+31 {
                 for j in 0..=255 {
                     for k in 0..=255 {
                         enigma.rotorSettings(r,j,k);
@@ -323,24 +326,24 @@ fn main() {
                             decrypted.push(enigma.encrypt(c as u8));
                         }
                         let f = fitness(&decrypted, &plaintext.to_string());
-                        if f > 10 {
-                            sender.send((r,j,k,f)).unwrap();
-                            // println!("{} {} Fitness: {}",j,k,f);
+                        if f > 100 {
+                            sender.send((idx,r,j,k,f)).unwrap();
+                            unsafe { done = true; }
                         }
+                        unsafe { if (done) {println!("Thread {} completed", idx); break 'outer;}}
                     }
                 }
             }
         });       
+        t.join().unwrap();
+        //threads.push(t);
     }
+
 
     for received in &receiver {
-        let (r,j, k, f) = received;
-        println!("{} {} {} Fitness: {}",r,j,k,f);
-    }
-
-    for received in &receiver2{
-        let i = received;
-        println!("I am thread {}", i.to_string());
+        let (i,r,j, k, f) = received;
+        println!("Thread {} found: {} {} {} Fitness: {}",i,r,j,k,f);
+        unsafe { if(done) {break;} }
     }
 }
 
