@@ -1,7 +1,8 @@
 #![allow(warnings, unused)]
 use std::collections::HashMap;
 use std::collections::HashSet;
-use std::thread;
+//use std::thread;
+use std::{thread, time};
 use std::sync::mpsc;
 
 // Attributes of the Rotor Struct
@@ -271,9 +272,9 @@ fn main() {
     //                        21);
 
     let mut enigma = Enigma::new(ufw_B,r2,r1,r3, plugboard);
-    static plaintext:&str = "But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure?";
+    static plaintext:&str = "Wetterbericht: // Datum: 15. Oktober 1944 // Einsatzort: Sonnenberg // Meldung! Meldung! Hier spricht der Wetterdienst fur den 15. Oktober 1944 im Einsatzgebiet Sonnenberg. // Die Wetterlage fur morgen wird voraussichtlich bedeckt sein, mit starkem Wind aus Osten. Die Temperaturen erreichen ein Maximum von rund 12C, was kuhler als gestern ist. // Es besteht eine hohe Wahrscheinlichkeit fur Niederschlage, mit einer Moglichkeit von Regen wahrend des Nachmittags. Alle Einheiten werden darauf hingewiesen, dass entsprechende Kleidung und Ausrustung fur die geplanten Operationen mitgefuhrt werden mussen. // Sicherheitshinweis: Bei Anderungen der Wetterlage sind die Kommandanten verantwortlich, die notwendigen Massnahmen zum Schutz der Truppen und Ausrustung zu ergreifen. // Das war der Wetterbericht. Bleiben Sie wachsam und passen Sie sich den Wetterbedingungen an. // Weitere Befehle oder Informationen konnen angefordert werden. Das war der Wetterdienst. // Heil Hitler!";
     static mut ciphertext:String = String::new();
-    enigma.rotorSettings(0,10,20);
+    enigma.rotorSettings(11,93,93);
 
     for c in plaintext.chars() {
         let i = enigma.encrypt(c as u8) as u8;
@@ -282,7 +283,7 @@ fn main() {
     unsafe{println!("{:?}", ciphertext);}
 
     let mut decrypted:String = String::new();
-    enigma.rotorSettings(0,10,20);
+    enigma.rotorSettings(11,93,93);
 
     unsafe {
         for c in ciphertext.chars() {
@@ -295,7 +296,6 @@ fn main() {
     // Make 8 threads
     //let mut threads : Vec<thread::JoinHandle<_>> = Vec::new();
     let (sender, receiver) = mpsc::channel();
-    let (sender2, receiver2) = mpsc::channel();
 
     static mut done: bool = false;
     println!("\nStarting 8 threads...");
@@ -304,9 +304,8 @@ fn main() {
         // static mut index: u8 = 0;
         // unsafe{index += i;}
         let sender = sender.clone();
-        let sender2 = sender2.clone();
         let t = thread::spawn(move || {
-            let plugboard = Plugboard::new(&[(b'a', b'u'),(b'9', b'T'),(b'Y', b'='),(b'3', b'y'),(b';', b'"'),(b't', b'#'),(b'f', b'r'),(b'C', b'_'),(b'i', b'%'),(b'/', b'$')]);
+            let plugboard = Plugboard::new(&[]);
             let mut ufw_B = Rotor::new(&[b'0', b'1', b'2', b'3', b'4', b'5', b'6', b'7', b'8', b'9', b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j', b'k', b'l', b'm', b'n', b'o', b'p', b'q', b'r', b's', b't', b'u', b'v', b'w', b'x', b'y', b'z', b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'I', b'J', b'K', b'L', b'M', b'N', b'O', b'P', b'Q', b'R', b'S', b'T', b'U', b'V', b'W', b'X', b'Y', b'Z', b'!', b'"', b'#', b'$', b'%', b'&', b' ', b'(', b')', b'*', b'+', b',', b'-', b'.', b'/', b':', b';', b'<', b'=', b'>', b'?', b'@', b'[', b'\\', b']', b'^', b'_', b'`', b'{', b'|', b'}', b'~'],
             &[b'w', b'z', b'u', b'L', b'?', b's', b'"', b'8', b'7', b'M', b'J', b'F', b'd', b'c', b'/', b':', b'#', b'$', b'>', b'q', b'o', b'|', b'@', b',', b'k', b'B', b'j', b' ', b'5', b'R', b'2', b'G', b'0', b'}', b'T', b'1', b'{', b'p', b'N', b'Q', b'K', b'b', b'v', b'O', b')', b'a', b'E', b'3', b'9', b'C', b'H', b'+', b'D', b't', b'^', b'y', b'Z', b'_', b';', b'`', b'!', b'U', b'Y', b'6', b'g', b'h', b'&', b'%', b'r', b'=', b'I', b'.', b'P', b'n', b'<', b'*', b'e', b'f', b'W', b'-', b'(', b'i', b'4', b'm', b']', b'~', b'[', b'S', b'V', b'X', b'A', b'l', b'x', b'\\'],
             0);
@@ -325,12 +324,14 @@ fn main() {
             let mut decrypted = "".to_string();
             let mut enigma = Enigma::new(ufw_B,r2,r1,r3, plugboard);
             let start : u8;
-            start = idx * 11;
-            sender2.send(idx);
+            start = idx * 12;
             //println!("I am thread {}", idx.to_string());
-            'outer: for r in start..start+11 {
+            'outer: for mut r in start..start+12 {
+                if (r > 93) { r = 93; }
+                //println!("{:?}",r);
                 for j in 0..94 {
                     for k in 0..94 {
+                        unsafe { if (done) {break 'outer;}}
                         enigma.rotorSettings(r,j,k);
                         let mut decrypted = "".to_string();
                         for c in cptext.chars() {
@@ -339,15 +340,14 @@ fn main() {
                         let f = fitness(&decrypted, &plaintext.to_string());
                         if f > 100 {
                             sender.send((idx,r,j,k,f)).unwrap();
+                            println!("{:?}",decrypted);
                             unsafe { done = true; }
                         }
-                        unsafe { if (done) {println!("Thread {} completed", idx); break 'outer;}}
                     }
                 }
             }
+            println!("Thread {idx} completed");
         });       
-        t.join().unwrap();
-        //threads.push(t);
     }
 
 
