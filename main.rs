@@ -1,9 +1,10 @@
-#![allow(warnings, unused)]
-use std::collections::HashMap;
-use std::collections::HashSet;
+//#![allow(warnings, unused)]
+mod enigma;
+use enigma::Enigma;
+use enigma::rotor::Rotor;
+use enigma::plugboard::Plugboard;
 use std::thread;
-use std::sync::mpsc;
-use std::sync::{Arc, Mutex};
+use std::sync::{mpsc, Arc, Mutex};
 
 fn main() {
     // let min_fitness = 20u64;
