@@ -6,6 +6,7 @@ use std::sync::mpsc;
 use std::sync::{Arc, Mutex};
 
 // Attributes of the Rotor Struct
+#[derive(Clone)]
 struct Rotor {
     orig: Vec<u8>,
     map: HashMap<u8,u8>,
@@ -133,7 +134,7 @@ impl Rotor {
     }
 }
 
-
+#[derive(Clone)]
 struct Plugboard {
     n: u8, // Number of characters used
     map: HashMap<u8,u8>, 
@@ -168,6 +169,7 @@ impl Plugboard {
 
 
 // Actual Machine
+#[derive(Clone)]
 struct Enigma {
     slowRotor: Rotor,
     midRotor: Rotor,
@@ -248,8 +250,7 @@ impl Enigma {
 
 fn main() {
     // let min_fitness = 20u64;
-    let plugboard = Plugboard::new(&[(b'B', b'U'),(b'`', b'N'),(b']', b'4'),(b'I', b'%'),(b'"', b'f'),(b'}', b'Z'),(b'D', b'+'),(b'A', b'9'),(b'3', b'8'),(b'*', b'2'),]
-);
+    let plugboard = Plugboard::new(&[(b'B', b'U'),(b'`', b'N'),(b']', b'4'),(b'I', b'%'),(b'"', b'f'),(b'}', b'Z'),(b'D', b'+'),(b'A', b'9'),(b'3', b'8'),(b'*', b'2'),]);
     let num_wires = (plugboard.map.len() as u8) / 2;
     let mut ufw_B = Rotor::new(&[b'0', b'1', b'2', b'3', b'4', b'5', b'6', b'7', b'8', b'9', b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j', b'k', b'l', b'm', b'n', b'o', b'p', b'q', b'r', b's', b't', b'u', b'v', b'w', b'x', b'y', b'z', b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'I', b'J', b'K', b'L', b'M', b'N', b'O', b'P', b'Q', b'R', b'S', b'T', b'U', b'V', b'W', b'X', b'Y', b'Z', b'!', b'"', b'#', b'$', b'%', b'&', b' ', b'(', b')', b'*', b'+', b',', b'-', b'.', b'/', b':', b';', b'<', b'=', b'>', b'?', b'@', b'[', b'\\', b']', b'^', b'_', b'`', b'{', b'|', b'}', b'~'],
         &[b'w', b'z', b'u', b'L', b'?', b's', b'"', b'8', b'7', b'M', b'J', b'F', b'd', b'c', b'/', b':', b'#', b'$', b'>', b'q', b'o', b'|', b'@', b',', b'k', b'B', b'j', b' ', b'5', b'R', b'2', b'G', b'0', b'}', b'T', b'1', b'{', b'p', b'N', b'Q', b'K', b'b', b'v', b'O', b')', b'a', b'E', b'3', b'9', b'C', b'H', b'+', b'D', b't', b'^', b'y', b'Z', b'_', b';', b'`', b'!', b'U', b'Y', b'6', b'g', b'h', b'&', b'%', b'r', b'=', b'I', b'.', b'P', b'n', b'<', b'*', b'e', b'f', b'W', b'-', b'(', b'i', b'4', b'm', b']', b'~', b'[', b'S', b'V', b'X', b'A', b'l', b'x', b'\\'],
@@ -263,44 +264,13 @@ fn main() {
     let mut r3 = Rotor::new(&[b'0', b'1', b'2', b'3', b'4', b'5', b'6', b'7', b'8', b'9', b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j', b'k', b'l', b'm', b'n', b'o', b'p', b'q', b'r', b's', b't', b'u', b'v', b'w', b'x', b'y', b'z', b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'I', b'J', b'K', b'L', b'M', b'N', b'O', b'P', b'Q', b'R', b'S', b'T', b'U', b'V', b'W', b'X', b'Y', b'Z', b'!', b'"', b'#', b'$', b'%', b'&', b' ', b'(', b')', b'*', b'+', b',', b'-', b'.', b'/', b':', b';', b'<', b'=', b'>', b'?', b'@', b'[', b'\\', b']', b'^', b'_', b'`', b'{', b'|', b'}', b'~'],
         &[b'T', b'y', b'l', b':', b'p', b'2', b'>', b'E', b'o', b'Q', b'+', b'f', b' ', b'!', b'(', b'M', b'L', b's', b'J', b'&', b'P', b'r', b'U', b'$', b'.', b'Y', b'|', b']', b'C', b';', b'^', b'W', b'9', b'?', b'{', b'D', b'n', b'%', b'@', b'V', b'I', b'7', b'B', b'N', b'u', b'6', b'~', b'"', b'5', b'q', b'c', b'K', b'0', b'4', b'`', b'\\', b'}', b'-', b'e', b'w', b'i', b'h', b'g', b'm', b',', b'b', b'k', b'3', b'X', b'=', b'[', b'j', b'R', b'O', b'_', b'v', b'H', b'd', b'<', b'x', b'#', b'A', b'*', b'z', b'/', b')', b't', b'S', b'a', b'G', b'F', b'1', b'8', b'Z'],
         47);
-    
-    //let mut ufw_B = Rotor::new(&[b'A',b'B',b'C',b'D',b'E',b'F',b'G',b'H',b'I',b'J',b'K',b'L',b'M',b'N',b'O',b'P',b'Q',b'R',b'S',b'T',b'U',b'V',b'W',b'X',b'Y',b'Z'],
-    //                           &[b'Y',b'R',b'U',b'H',b'Q',b'S',b'L',b'D',b'P',b'X',b'N',b'G',b'O',b'K',b'M',b'I',b'E',b'B',b'F',b'Z',b'C',b'W',b'V',b'J',b'A',b'T'],
-    //                           0);
-    //let mut r1 = Rotor::new(&[b'A',b'B',b'C',b'D',b'E',b'F',b'G',b'H',b'I',b'J',b'K',b'L',b'M',b'N',b'O',b'P',b'Q',b'R',b'S',b'T',b'U',b'V',b'W',b'X',b'Y',b'Z'],
-    //                        &[b'E',b'K',b'M',b'F',b'L',b'G',b'D',b'Q',b'V',b'Z',b'N',b'T',b'O',b'W',b'Y',b'H',b'X',b'U',b'S',b'P',b'A',b'I',b'B',b'R',b'C',b'J'],
-    //                        16);
-    //let mut r2 = Rotor::new(&[b'A',b'B',b'C',b'D',b'E',b'F',b'G',b'H',b'I',b'J',b'K',b'L',b'M',b'N',b'O',b'P',b'Q',b'R',b'S',b'T',b'U',b'V',b'W',b'X',b'Y',b'Z'],
-    //                        &[b'A',b'J',b'D',b'K',b'S',b'I',b'R',b'U',b'X',b'B',b'L',b'H',b'W',b'T',b'M',b'C',b'Q',b'G',b'Z',b'N',b'P',b'Y',b'F',b'V',b'O',b'E'],
-    //                        4);
-    //let mut r3 = Rotor::new(&[b'A',b'B',b'C',b'D',b'E',b'F',b'G',b'H',b'I',b'J',b'K',b'L',b'M',b'N',b'O',b'P',b'Q',b'R',b'S',b'T',b'U',b'V',b'W',b'X',b'Y',b'Z'],
-    //                        &[b'B',b'D',b'F',b'H',b'J',b'L',b'C',b'P',b'R',b'T',b'X',b'V',b'Z',b'N',b'Y',b'E',b'I',b'W',b'G',b'A',b'K',b'M',b'U',b'S',b'Q',b'O'],
-    //                        21);
+    let mut rotorSettings = (1, 25, 24);
+    let mut enigma = Enigma::new(ufw_B, r2, r1, r3, plugboard);
 
-    let mut enigma = Enigma::new(ufw_B,r2,r1,r3, plugboard);
     static plaintext:&str = "Wetterbericht: // Datum: 15. Oktober 1940 // Einsatzort: Sonnenberg // Meldung! Meldung! Hier spricht der Wetterdienst fur den 15. Oktober 1944 im Einsatzgebiet Sonnenberg. // Die Wetterlage fur morgen wird voraussichtlich bedeckt sein, mit starkem Wind aus Osten. Die Temperaturen erreichen ein Maximum von rund 12C, was kuhler als gestern ist. // Es besteht eine hohe Wahrscheinlichkeit fur Niederschlage, mit einer Moglichkeit von Regen wahrend des Nachmittags. Alle Einheiten werden darauf hingewiesen, dass entsprechende Kleidung und Ausrustung fur die geplanten Operationen mitgefuhrt werden mussen. // Sicherheitshinweis: Bei Anderungen der Wetterlage sind die Kommandanten verantwortlich, die notwendigen Massnahmen zum Schutz der Truppen und Ausrustung zu ergreifen. // Das war der Wetterbericht. Bleiben Sie wachsam und passen Sie sich den Wetterbedingungen an. // Weitere Befehle oder Informationen konnen angefordert werden. Das war der Wetterdienst. // Heil Hitler!";
-    // static plaintext:&str = "Es ist von entscheidender Bedeutung, dass unsere Truppen sich den wechselnden Wetterbedingungen anpassen. Plant und koordiniert Bewegungen, Logistik und taktische Operationen entsprechend. Denkt daran, dass das Wetter sowohl ein Verdundeter als auch ein Gegner sein kann, je nachdem, wie gut wir uns den Herausforderungen stellen.";
+
+    let ciphertext = setupActualEngima(&enigma, &rotorSettings, plaintext);
     
-    static mut ciphertext:String = String::new();
-
-    enigma.rotorSettings(1,25,24);
-
-    for c in plaintext.chars() {
-        let i = enigma.encrypt(c as u8) as u8;
-        unsafe{ ciphertext.push(i as char);}
-    }
-    unsafe{println!("{:?}", ciphertext);}
-
-    let mut decrypted:String = String::new();
-    enigma.rotorSettings(1,25, 24);
-    unsafe{
-        for c in ciphertext.chars() {
-            let i = enigma.encrypt(c as u8) as u8;
-            decrypted.push(i as char);
-        }
-    }
-    println!("{:?}", decrypted);
-
     // Reset enigma machine
     // Setup engima machine for attack
     enigma.rotorSettings(0, 0, 0);
@@ -327,6 +297,7 @@ fn main() {
     
     // Create threads
     for idx in 0..8 {
+        let ciphertext = ciphertext.clone();
         let maximum_fitness = Arc::clone(&maximum_fitness);
         let chosen_rotor_Config = Arc::clone(&chosen_rotor_Config);
 
@@ -556,6 +527,34 @@ fn main() {
     assert_eq!(plaintext,decrypted);
 }
 
+fn setupActualEngima(enigma: &Enigma, 
+    rotorSettings: &(u8, u8, u8), plaintext: &str) -> String{
+        println!("Creating Actual Enigma Machine...");
+
+        let mut ciphertext:String = String::new();
+
+        let (pos1, pos2, pos3) = rotorSettings;
+        enigma.rotorSettings(*pos1, *pos2, *pos3);
+
+        for c in plaintext.chars() {
+            let i = enigma.encrypt(c as u8) as u8;
+            ciphertext.push(i as char)
+        }
+
+        println!("Ciphertext generated: {:?}", ciphertext);
+
+        let mut decrypted:String = String::new();
+        enigma.rotorSettings(*pos1, *pos2, *pos3);
+        for c in ciphertext.chars() {
+            let i = enigma.encrypt(c as u8) as u8;
+            decrypted.push(i as char);
+        }
+
+        println!("Decrypted Ciphertext: {:?}", decrypted);
+
+        return ciphertext
+    }
+
 
 fn fitness(s: &String, known_plaintext: &String) -> u64 {
     let mut counter = 0u64;
@@ -565,5 +564,5 @@ fn fitness(s: &String, known_plaintext: &String) -> u64 {
             counter += 1; 
         }
     }
-    counter
+    return counter;
 }
