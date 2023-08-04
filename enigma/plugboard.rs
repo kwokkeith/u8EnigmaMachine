@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 pub struct Plugboard {
-    pub n: u8, // Number of characters used
+    n: u8, // Number of characters used
     pub map: HashMap<u8,u8>, 
 }
 
@@ -23,7 +23,7 @@ impl Plugboard {
 
 
     // Puts signal through plugboard and get new value
-    pub fn encipher(&self, input: u8) -> u8 {
+    fn encipher(&self, input: u8) -> u8 {
         // If no connection between two keys (wire), MAP back to same value
         if !self.map.contains_key(&input) {
             return input;
