@@ -3,11 +3,11 @@ use std::collections::HashMap;
 // Attributes of the Rotor Struct
 pub struct Rotor {
     pub orig: Vec<u8>,
-    map: HashMap<u8,u8>,
-    imap: HashMap<u8,u8>,
-    n: u16,
+    pub map: HashMap<u8,u8>,
+    pub imap: HashMap<u8,u8>,
+    pub n: u16,
     pub pos: u8,
-    notch: u8,
+    pub notch: u8,
 }
 
 
