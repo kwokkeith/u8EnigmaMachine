@@ -7,21 +7,21 @@ use std::collections::HashMap;
 
 // Actual Machine
 pub struct Enigma {
-    pub slowRotor: Rotor,
-    pub midRotor: Rotor,
-    pub fastRotor: Rotor,
+    pub slow_rotor: Rotor,
+    pub mid_rotor: Rotor,
+    pub fast_rotor: Rotor,
     pub plugboard: Plugboard,
     pub reflector: HashMap<u8,u8>,
 }
 
 impl Enigma {
-    pub fn new(reflectorRotor: Rotor, slowRotor: Rotor, midRotor: Rotor, fastRotor: Rotor, plugboard: Plugboard) -> Enigma {
+    pub fn new(reflector_rotor: Rotor, slow_rotor: Rotor, mid_rotor: Rotor, fast_rotor: Rotor, plugboard: Plugboard) -> Enigma {
         Enigma {
-            slowRotor,
-            midRotor,
-            fastRotor,
+            slow_rotor,
+            mid_rotor,
+            fast_rotor,
             plugboard,
-            reflector: reflectorRotor.map,
+            reflector: reflector_rotor.map,
         }
     }
 
@@ -30,20 +30,20 @@ impl Enigma {
         // Double Stepping Mid rotor (ANOMALY FOUND IN THE ORIGINAL ENIGMA)
         // In real machine, as long as mid rotor is at notch and fast rotor starts
         // to move, the mid rotor will step immediately.
-        if self.midRotor.pos == self.midRotor.notch {
-            self.slowRotor.step();
-            self.midRotor.step();
+        if self.mid_rotor.pos == self.mid_rotor.notch {
+            self.slow_rotor.step();
+            self.mid_rotor.step();
         }
         // Single Stepping Mid Rotor
-        if self.fastRotor.pos == self.fastRotor.notch {
+        if self.fast_rotor.pos == self.fast_rotor.notch {
             // Single Stepping Slow rotor
-            if self.midRotor.pos == self.midRotor.notch {
-                self.slowRotor.step();
+            if self.mid_rotor.pos == self.mid_rotor.notch {
+                self.slow_rotor.step();
             }
-            self.midRotor.step();
+            self.mid_rotor.step();
         }
         // Step Fast rotor
-        self.fastRotor.step();
+        self.fast_rotor.step();
     }
 
 
@@ -56,13 +56,13 @@ impl Enigma {
         input = self.plugboard.encipher(input);
 
         // Input is mutated for the next rotor/wheel
-        input = self.fastRotor.encipherPos(input) as u8;
-        input = self.midRotor.encipherPos(input) as u8;
-        input = self.slowRotor.encipherPos(input) as u8;
+        input = self.fast_rotor.encipher_pos(input) as u8;
+        input = self.mid_rotor.encipher_pos(input) as u8;
+        input = self.slow_rotor.encipher_pos(input) as u8;
         input = self.reflector[&input];
-        input = self.slowRotor.decipherPos(input) as u8;
-        input = self.midRotor.decipherPos(input) as u8;
-        input = self.fastRotor.decipherPos(input) as u8;
+        input = self.slow_rotor.decipher_pos(input) as u8;
+        input = self.mid_rotor.decipher_pos(input) as u8;
+        input = self.fast_rotor.decipher_pos(input) as u8;
 
         // Plugboard
         input = self.plugboard.encipher(input);
@@ -71,15 +71,15 @@ impl Enigma {
 
 
     // Starting position of the rotor (Part of Key)
-    pub fn rotorSettings(&mut self, pos1: u8, pos2: u8, pos3: u8) {
-        self.slowRotor.pos = pos1;
-        self.midRotor.pos = pos2;
-        self.fastRotor.pos = pos3;
+    pub fn rotor_settings(&mut self, pos1: u8, pos2: u8, pos3: u8) {
+        self.slow_rotor.pos = pos1;
+        self.mid_rotor.pos = pos2;
+        self.fast_rotor.pos = pos3;
     }
 
     // Change the settings of the plugboard
-    pub fn setPlugboard(&mut self, newPlugBoard: Plugboard) {
-        self.plugboard = newPlugBoard;
+    pub fn set_plugboard(&mut self, new_plug_board: Plugboard) {
+        self.plugboard = new_plug_board;
     }
 }
 
