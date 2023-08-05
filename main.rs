@@ -263,6 +263,7 @@ fn main() {
     println!("{}", decrypted);
     assert_eq!(plaintext,decrypted);
 
+
     // DECRYPT flag with found enigma machine configuration
     enigma.rotorSettings(cr, cj, ck);
     let mut decrypted = "".to_string();
