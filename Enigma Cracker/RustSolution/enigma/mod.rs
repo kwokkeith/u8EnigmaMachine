@@ -11,7 +11,7 @@ pub struct Enigma {
     pub mid_rotor: Rotor,
     pub fast_rotor: Rotor,
     pub plugboard: Plugboard,
-    pub reflector: HashMap<u8,u8>,
+    pub reflector: [u8;256],
 }
 
 impl Enigma {
@@ -59,7 +59,7 @@ impl Enigma {
         input = self.fast_rotor.encipher_pos(input) as u8;
         input = self.mid_rotor.encipher_pos(input) as u8;
         input = self.slow_rotor.encipher_pos(input) as u8;
-        input = self.reflector[&input];
+        input = self.reflector[input as usize];
         input = self.slow_rotor.decipher_pos(input) as u8;
         input = self.mid_rotor.decipher_pos(input) as u8;
         input = self.fast_rotor.decipher_pos(input) as u8;

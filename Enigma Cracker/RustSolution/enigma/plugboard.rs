@@ -2,20 +2,20 @@ use std::collections::HashMap;
 
 pub struct Plugboard {
     pub n: u8, // Number of characters used
-    pub map: HashMap<u8,u8>, 
-    pub one_way_map: HashMap<char,char>, 
+    pub map: [u8;256],
+    pub one_way_map: HashMap<char,char>,
 }
 
 // Implementation of the Rotor Struct methods
 impl Plugboard {
     pub fn new(mapping: &[(u8,u8)]) -> Plugboard {
-        let mut map: HashMap<u8,u8> = HashMap::new();
+        let mut map = [255u8;256];
         let mut one_way_map: HashMap<char,char> = HashMap::new();
         for t in mapping {
             let (a, b) = t;
             one_way_map.insert(*a as char, *b as char);
-            map.insert(*a, *b);
-            map.insert(*b, *a); 
+            map[*a as usize] = *b;
+            map[*b as usize] = *a; 
         }
 
         return Plugboard {
@@ -29,10 +29,10 @@ impl Plugboard {
     // Puts signal through plugboard and get new value
     pub fn encipher(&self, input: u8) -> u8 {
         // If no connection between two keys (wire), MAP back to same value
-        if !self.map.contains_key(&input) {
+        if self.map[input as usize] == 255 {
             return input;
         }
-        return self.map[&input];
+        return self.map[input as usize];
     }
 }
 

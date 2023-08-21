@@ -1,4 +1,3 @@
-
 mod enigma;
 use enigma::Enigma;
 use enigma::rotor::Rotor;
@@ -25,7 +24,7 @@ const CIPHERTEXT_FLAG:&str = "ro\"oqSA=\"I.Vwr@bw2?d*;_~M8f+|Q>pUB49X1A%jiHIM%p<
 fn main() {
     let plugboard = Plugboard::new(&[(b'B', b'U'),(b'`', b'N'),(b']', b'4'),(b'I', b'%'),(b'"', b'f'),(b'}', b'Z'),(b'D', b'+'),(b'A', b'9'),(b'3', b'8'),(b'*', b'2'),]
 );
-    let num_wires = (plugboard.map.len() as u8) / 2;
+    let num_wires = 10;
     let ufw_b = Rotor::new(ORIG, UFW_B_MAP, 0);
     let r1 = Rotor::new(ORIG, R1_MAP, 12);
     let r2 = Rotor::new(ORIG, R2_MAP, 14);
@@ -50,7 +49,7 @@ fn main() {
     let chosen_rotor_config = Arc::new(Mutex::new((0 as u8,0 as u8,0 as u8,0 as u64)));
     let mut handles: Vec<thread::JoinHandle<()>> = Vec::new();
 
-    let num_threads = 8u8;
+    let num_threads = 10u8;
     println!("\n-------------------------------Known Plaintext Attack------------------------------------");
     println!("Crib plaintext: {KNOWN_PLAINTEXT}\n");
     println!("Crib ciphertext: {KNOWN_CIPHERTEXT}\n");
@@ -96,7 +95,6 @@ fn main() {
             });
             handles.push(handle);
     }
-
     for handle in handles {
         handle.join().unwrap();
     }
@@ -265,9 +263,9 @@ fn main() {
     println!("Plugboard Setting: {}", enigma.plugboard);
     println!("\nDecrypted Flag with final configuration: ");
     println!("{decrypted}");
-    println!("\n\nPress Enter to continue...");
-    let stdin = io::stdin();
-    let _ = stdin.read_line(&mut String::new());
+    //println!("\n\nPress Enter to continue...");
+    //let stdin = io::stdin();
+    //let _ = stdin.read_line(&mut String::new());
 }
 
 fn fitness(s: &String, plaintext: &String) -> u64 {
