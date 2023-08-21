@@ -1,0 +1,69 @@
+//this solution is the simplest way to brute force the enigma encryption and there are many ways to automate this to solve it faster
+
+
+//First we create function to simulate the enigma engine and brute force each component
+ Class solve_enigma(enigma):
+Printablecharacters = list of 8 bit ASCII characters
+//Solve the 3 rotor initial configurations
+
+Function solve_rotor():
+enigma.setPlugboard(chosen_wire_positions)//choose the most optimum wire configurations
+bestfit = 0
+best_rotor_config = null
+ for i in len(Printablecharacters):
+  for j in len(Printablecharacters):
+    for k in len(Printablecharacters):
+      enigma.rotorSettings(i,j,k)
+      ciphertext = enigma.encrypt(known_plaintext)
+      decrypted_string = enigma.decrypt(ciphertext)
+      //Run the fitness_test
+      if bestfit< fitness_test:
+        bestfit = fitness_test
+        best_rotor_config = i,j,k // save the best rotor configuration
+print(best_rotor_config) //might want to save this somewhere for later use
+
+
+
+
+
+
+
+
+
+//Solve the plugboard configuration
+Function solve_plugboard():
+enigma.rotorsettings(Rotor1,Rotor2,Rotor3) //choose the best settin for the 3 Rotors
+//choose the wire positions used in the plugboard for 1 wire
+best_wire_config = null
+for q in Printablecharacters:
+ for w in Printablecharacters && w!=q:
+ wire = choose_wire_positions(q,w) // this is to simulate plugging the wire into two different characters on the plugboard
+ //literate through the plaintext, compare it to the cipher text and run fitness test
+ bestfit = 0
+ enigma.setPlugboard(wire)
+ ciphertext = enigma.encrypt(known_plaintext)
+ decrypted_string = enigma.decrypt(ciphertext)
+ //Run the fitness_test
+ if bestfit< fitness_test:
+  bestfit = fitness_test
+  wire = best_wire_config
+//remove the 2 letters in the list of ASCII characters and run the function again to check if another wire has been used, do this till bestfit stops increasing
+
+
+
+
+
+//check with the given plaintext
+Function fitness(decrypted_string,known_plaintext):
+Fitness_counter = 0 // the higher this number is, more matches your current configuration has, the max number should be the total length of the given plaintext, including whitespaces
+ for i in decrypted_string:
+  put each characters in list A
+ for n in known_plaintext:
+ put each character in list B
+
+for x in A.len():
+ compare both characters
+ if A=B:
+ counter +=1
+return Fitness_counter
+
